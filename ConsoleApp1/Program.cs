@@ -39,46 +39,87 @@ namespace Program360
             for (int i=1; i<matches.Length; i++)
             {
                 string[] matchArray = matches[i].Split(delimiters);
-                foreach (string s in matchArray)
-                {
-                    Console.Write(s + ",");
-                }
-                Console.WriteLine();
                 string awayTeam = matchArray[0];
                 string homeTeam = matchArray[3];
-                // Check for six matchups: A vs B, A vs C, A vs D, B vs C, B vs D, C vs D
-                if ( awayTeam.Equals(teamA) && homeTeam.Equals(teamB) 
-                    || awayTeam.Equals(teamB) && homeTeam.Equals(teamA) )
+                // Check for twelve matchups:
+                // A @ B, A @ C, A @ D, B @ A, B @ C, B A D,
+                // C @ A, C @ B, C @ D, D @ A, D @ B, D @ C
+                if ( awayTeam.Equals(teamA) && homeTeam.Equals(teamB) )
                 {
                     UpdateStats(matchArray, statsA, statsB);   
                 }
-                else if ( awayTeam.Equals(teamA) && homeTeam.Equals(teamC)
-                    || awayTeam.Equals(teamC) && homeTeam.Equals(teamA) )
+                else if ( awayTeam.Equals(teamA) && homeTeam.Equals(teamC) )
                 {
                     UpdateStats(matchArray, statsA, statsC);
                 }
-                else if ( awayTeam.Equals(teamA) && homeTeam.Equals(teamD)
-                    || awayTeam.Equals(teamD) && homeTeam.Equals(teamA) )
+                else if ( awayTeam.Equals(teamA) && homeTeam.Equals(teamD) )
                 {
                     UpdateStats(matchArray, statsA, statsD);
                 }
-                else if ( awayTeam.Equals(teamB) && homeTeam.Equals(teamC)
-                    || awayTeam.Equals(teamC) && homeTeam.Equals(teamB) )
+                else if ( awayTeam.Equals(teamB) && homeTeam.Equals(teamA) )
+                {
+                    UpdateStats(matchArray, statsB, statsA);
+                }
+                else if ( awayTeam.Equals(teamB) && homeTeam.Equals(teamC) )
                 {
                     UpdateStats(matchArray, statsB, statsC);
                 }
-                else if ( awayTeam.Equals(teamB) && homeTeam.Equals(teamD)
-                    || awayTeam.Equals(teamD) && homeTeam.Equals(teamB) )
+                else if ( awayTeam.Equals(teamB) && homeTeam.Equals(teamD) )
                 {
                     UpdateStats(matchArray, statsB, statsD);
                 }
-                else if (awayTeam.Equals(teamC) && homeTeam.Equals(teamD)
-                    || awayTeam.Equals(teamD) && homeTeam.Equals(teamC))
+                else if ( awayTeam.Equals(teamC) && homeTeam.Equals(teamA) )
+                {
+                    UpdateStats(matchArray, statsC, statsA);
+                }
+                else if ( awayTeam.Equals(teamC) && homeTeam.Equals(teamB))
+                {
+                    UpdateStats(matchArray, statsC, statsB);
+                }
+                else if (awayTeam.Equals(teamC) && homeTeam.Equals(teamD) )
                 {
                     UpdateStats(matchArray, statsC, statsD);
                 }
+                else if ( awayTeam.Equals(teamD) && homeTeam.Equals(teamA) )
+                {
+                    UpdateStats(matchArray, statsD, statsA);
+                }
+                else if ( awayTeam.Equals(teamD) && homeTeam.Equals(teamB) )
+                {
+                    UpdateStats(matchArray, statsD, statsB);
+                }
+                else if ( awayTeam.Equals(teamD) && homeTeam.Equals(teamC) )
+                {
+                    UpdateStats(matchArray, statsD, statsC);
+                }
             }
 
+            Console.Write(teamA + ": ");
+            for (int i=0; i<statsA.Length; i++)
+            {
+                Console.Write(statsA[i] + ",");
+            }
+            Console.WriteLine();
+            Console.Write(teamB + ": ");
+            for (int i = 0; i < statsB.Length; i++)
+            {
+                Console.Write(statsB[i] + ",");
+            }
+            Console.WriteLine();
+            Console.Write(teamC + ": ");
+            for (int i = 0; i < statsC.Length; i++)
+            {
+                Console.Write(statsC[i] + ",");
+            }
+            Console.WriteLine();
+            Console.Write(teamD + ": ");
+            for (int i = 0; i < statsD.Length; i++)
+            {
+                Console.Write(statsD[i] + ",");
+            }
+
+            // unordered array of all the teams' stats
+            int[][] allStats = { statsA, statsB, statsC, statsD };
 
             return rankings;
         }
@@ -94,12 +135,6 @@ namespace Program360
          */
         static void UpdateStats(string[] matchArray, int[] awayTeamStats, int[] homeTeamStats)
         {
-/*            // Split the match string into a temporary string array with the form:
-            // {"awayTeam", "awayTeamGoals", "homeTeamGoals", "homeTeam"}
-            //  0           1                2                3
-            char[] delimiters = { '#', '@' };
-            string[] temp = match.Split(delimiters);*/
-
             // increment games played
             awayTeamStats[1] += 1;
             homeTeamStats[1] += 1;
