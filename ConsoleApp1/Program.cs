@@ -13,12 +13,13 @@ namespace Program360
          */
         public static string[] getRankings(string[] matches)
         {
-            // The rankings array stores the group name first, then
-            // the teams ranked 1-4.
+            // The rankings array stores the group name first, then the teams ranked 1-4.
             string[] rankings = new string[5];
             rankings[0] = matches[0];
 
             // Create the teams from the first two matches.
+            // Match arrays have the form: {"awayTeam", "awayTeamGoals", "homeTeamGoals", "homeTeam"}
+            //                              0           1                2                3
             char[] delimiters = { '#', '@' };
             string[] match1 = matches[1].Split(delimiters);
             string[] match2 = matches[2].Split(delimiters);
@@ -30,10 +31,7 @@ namespace Program360
             // Loop through the matches and add to each team's stats.
             for (int i = 1; i < matches.Length; i++)
             {
-                // Match array: {"awayTeam", "awayTeamGoals", "homeTeamGoals", "homeTeam"}
-                //               0           1                2                3
                 string[] matchArray = matches[i].Split(delimiters);
-                
                 Team home;
                 Team away;
                 if ( matchArray[0].Equals(a.Name) )
@@ -72,12 +70,22 @@ namespace Program360
                 UpdateStats(matchArray, away, home);
             }
 
+            // Sort the teams.
             Team[] teams = { a, b, c, d };
             Array.Sort(teams);
 
-            foreach (Team team in teams)
+            // Place the teams into the rankings.
+            // "<final-rank>) <Team-name> <points>p, <games-played>g (<W>-<T>-<L>), <goal-differential>gd (<goals-scored>-<goals-against>)"
+            for (int i=0; i<teams.Length; i++)
             {
-                Console.WriteLine(team);
+                Team team = teams[i];
+                rankings[i + 1] = $"{i + 1}) {team.Name} {team.Points}p, {team.GamesPlayed}g ({team.Wins}-{team.Ties}-{team.Losses}), " +
+                    $"{team.NetGoals}gd ({team.GoalsScored}-{team.GoalsAgainst})";
+            }
+
+            foreach (string s in rankings)
+            {
+                Console.WriteLine(s);
             }
 
             return rankings;
