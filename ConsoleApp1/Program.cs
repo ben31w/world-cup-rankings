@@ -71,13 +71,16 @@ namespace Program360
 
                 UpdateStats(matchArray, away, home);
             }
-            
-            Console.WriteLine(a);
-            Console.WriteLine(b);
-            Console.WriteLine(c);
-            Console.WriteLine(d);
 
-                return rankings;
+            Team[] teams = { a, b, c, d };
+            Array.Sort(teams);
+
+            foreach (Team team in teams)
+            {
+                Console.WriteLine(team);
+            }
+
+            return rankings;
         }
 
         /**
@@ -208,9 +211,81 @@ namespace Program360
             // e.g., Spain 6p, 3g (2-0-1), 2gd (4-2)"
             return $"{_name} {_points}p, {_gamesPlayed}g ({_wins}-{_ties}-{_losses}), {_netGoals}gd ({_goalsScored}-{_goalsAgainst})";
         }
-        public int CompareTo(Team? other)
+
+        /**
+         * Comparison criteria for two teams is incremental (i.e., next rule applies when there are ties):
+         * 1. Most points earned
+         * 2. Most wins
+         * 3. Most goal difference (i.e., goals scored - goals against)
+         * 4. Most goals scored
+         * 5. Less matches played
+         * 6. Alphabetical order (i.e., ascending)
+         * 
+         * return -1 if this team ranks before the other team
+         *         1 if this team ranks after the other team
+         */
+        public int CompareTo(Team other)
         {
-            return 0;
+            if (other == null)
+            {
+                return 1;
+            }
+
+            Team otherTeam = other as Team;
+            if (otherTeam == null)
+            {
+                throw new ArgumentException("Comparison object is not a Team");
+            }
+
+            // 1. Which team has more points?
+            if (this._points > otherTeam._points)
+            {
+                return -1;
+            }
+            else if (this._points < otherTeam._points)
+            {
+                return 1;
+            }
+            // 2. Which team has more wins?
+            if (this._wins > otherTeam._wins)
+            {
+                return -1;
+            }
+            else if (this._wins < otherTeam._wins)
+            {
+                return 1;
+            }
+            // 3. Which team has a better goal differential?
+            if (this._netGoals > other._netGoals)
+            {
+                return -1;
+            }
+            else if (this._netGoals < other._netGoals)
+            {
+                return 1;
+            }
+            // 4. Which team has scored more goals?
+            if (this._goalsScored > other._goalsAgainst)
+            {
+                return -1;
+            }
+            else if (this._goalsScored < other._goalsAgainst)
+            {
+                return 1;
+            }
+            // 5. Which team has played less matches?
+            if (this._gamesPlayed < other._gamesPlayed)
+            {
+                return -1;
+            }
+            else if (this._gamesPlayed > other._gamesPlayed)
+            {
+                return 1;
+            }
+            // 6. Which team comes first in alphabetical order?
+            return this._name.CompareTo(other._name);
         }
+        
     }
+
 }
