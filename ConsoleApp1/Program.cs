@@ -18,110 +18,66 @@ namespace Program360
             string[] rankings = new string[5];
             rankings[0] = matches[0];
 
-            // Store team names in strings. Get team names from first two matches.
+            // Create the teams from the first two matches.
             char[] delimiters = { '#', '@' };
             string[] match1 = matches[1].Split(delimiters);
             string[] match2 = matches[2].Split(delimiters);
-            string teamA = match1[0];
-            string teamB = match1[3];
-            string teamC = match2[0];
-            string teamD = match2[3];
-
-            // Store each team's stats in an array of integers.
-            // {pts, games played, W, T, L, goal differential, goals scored, goals against}
-            //  0    1             2  3  4  5                  6             7
-            int[] statsA = new int[8];
-            int[] statsB = new int[8];
-            int[] statsC = new int[8];
-            int[] statsD = new int[8];
+            Team a = new Team(match1[0]);
+            Team b = new Team(match1[3]);
+            Team c = new Team(match2[0]);
+            Team d = new Team(match2[3]);
 
             // Loop through the matches and add to each team's stats.
-            for (int i=1; i<matches.Length; i++)
+            for (int i = 1; i < matches.Length; i++)
             {
+                // Match array: {"awayTeam", "awayTeamGoals", "homeTeamGoals", "homeTeam"}
+                //               0           1                2                3
                 string[] matchArray = matches[i].Split(delimiters);
-                string awayTeam = matchArray[0];
-                string homeTeam = matchArray[3];
-                // Check for twelve matchups:
-                // A @ B, A @ C, A @ D, B @ A, B @ C, B A D,
-                // C @ A, C @ B, C @ D, D @ A, D @ B, D @ C
-                if ( awayTeam.Equals(teamA) && homeTeam.Equals(teamB) )
+                
+                Team home;
+                Team away;
+                if ( matchArray[0].Equals(a.Name) )
                 {
-                    UpdateStats(matchArray, statsA, statsB);   
+                    away = a;
                 }
-                else if ( awayTeam.Equals(teamA) && homeTeam.Equals(teamC) )
+                else if ( matchArray[0].Equals(b.Name) )
                 {
-                    UpdateStats(matchArray, statsA, statsC);
+                    away = b;
                 }
-                else if ( awayTeam.Equals(teamA) && homeTeam.Equals(teamD) )
+                else if ( matchArray[0].Equals(c.Name) )
                 {
-                    UpdateStats(matchArray, statsA, statsD);
+                    away = c;
                 }
-                else if ( awayTeam.Equals(teamB) && homeTeam.Equals(teamA) )
+                else
                 {
-                    UpdateStats(matchArray, statsB, statsA);
+                    away = d;
                 }
-                else if ( awayTeam.Equals(teamB) && homeTeam.Equals(teamC) )
+                if ( matchArray[3].Equals(a.Name) )
                 {
-                    UpdateStats(matchArray, statsB, statsC);
+                    home = a;
                 }
-                else if ( awayTeam.Equals(teamB) && homeTeam.Equals(teamD) )
+                else if ( matchArray[3].Equals(b.Name) )
                 {
-                    UpdateStats(matchArray, statsB, statsD);
+                    home = b;
                 }
-                else if ( awayTeam.Equals(teamC) && homeTeam.Equals(teamA) )
+                else if ( matchArray[3].Equals(c.Name) )
                 {
-                    UpdateStats(matchArray, statsC, statsA);
+                    home = c;
                 }
-                else if ( awayTeam.Equals(teamC) && homeTeam.Equals(teamB))
+                else
                 {
-                    UpdateStats(matchArray, statsC, statsB);
+                    home = d;
                 }
-                else if (awayTeam.Equals(teamC) && homeTeam.Equals(teamD) )
-                {
-                    UpdateStats(matchArray, statsC, statsD);
-                }
-                else if ( awayTeam.Equals(teamD) && homeTeam.Equals(teamA) )
-                {
-                    UpdateStats(matchArray, statsD, statsA);
-                }
-                else if ( awayTeam.Equals(teamD) && homeTeam.Equals(teamB) )
-                {
-                    UpdateStats(matchArray, statsD, statsB);
-                }
-                else if ( awayTeam.Equals(teamD) && homeTeam.Equals(teamC) )
-                {
-                    UpdateStats(matchArray, statsD, statsC);
-                }
-            }
 
-            Console.Write(teamA + ": ");
-            for (int i=0; i<statsA.Length; i++)
-            {
-                Console.Write(statsA[i] + ",");
+                UpdateStats(matchArray, away, home);
             }
-            Console.WriteLine();
-            Console.Write(teamB + ": ");
-            for (int i = 0; i < statsB.Length; i++)
-            {
-                Console.Write(statsB[i] + ",");
-            }
-            Console.WriteLine();
-            Console.Write(teamC + ": ");
-            for (int i = 0; i < statsC.Length; i++)
-            {
-                Console.Write(statsC[i] + ",");
-            }
-            Console.WriteLine();
-            Console.Write(teamD + ": ");
-            for (int i = 0; i < statsD.Length; i++)
-            {
-                Console.Write(statsD[i] + ",");
-            }
+            
+            Console.WriteLine(a);
+            Console.WriteLine(b);
+            Console.WriteLine(c);
+            Console.WriteLine(d);
 
-            // unordered array of all the teams' stats
-            int[][] allStats = { statsA, statsB, statsC, statsD };
-
-            return rankings;
+                return rankings;
         }
 
         /**
@@ -129,52 +85,132 @@ namespace Program360
          * 
          * Match array has the form:   {"awayTeam", "awayTeamGoals", "homeTeamGoals", "homeTeam"}
          *                              0           1                2                3
-         * 
-         * Stats arrays have the form:  {pts, games played, W, T, L, goal differential, goals scored, goals against}
-         *                               0    1             2  3  4  5                  6             7
          */
-        static void UpdateStats(string[] matchArray, int[] awayTeamStats, int[] homeTeamStats)
+        static void UpdateStats(string[] matchArray, Team away, Team home)
         {
-            // increment games played
-            awayTeamStats[1] += 1;
-            homeTeamStats[1] += 1;
+            // Increment games played.
+            away.GamesPlayed += 1;
+            home.GamesPlayed += 1;
 
-            // update goal differential, goals scored, goals against
+            // Update net goals, goals scored, and goals against.
             int awayGoals = Int32.Parse(matchArray[1]);
             int homeGoals = Int32.Parse(matchArray[2]);
-            awayTeamStats[5] += awayGoals - homeGoals;
-            homeTeamStats[5] += homeGoals - awayGoals;
-            awayTeamStats[6] += awayGoals;
-            homeTeamStats[6] += homeGoals;
-            awayTeamStats[7] += homeGoals;
-            homeTeamStats[7] += awayGoals;
+            away.NetGoals += awayGoals - homeGoals;
+            away.GoalsScored += awayGoals;
+            away.GoalsAgainst += homeGoals;
+            home.NetGoals += homeGoals - awayGoals;
+            home.GoalsScored += homeGoals;
+            home.GoalsAgainst += awayGoals;
 
-            // TIE: +1 pts, +1 tie for both teams
+            // TIE: TIE: +1 pts, +1 tie for both teams
             if (awayGoals == homeGoals)
             {
-                awayTeamStats[0] += 1;
-                homeTeamStats[0] += 1;
-                awayTeamStats[3] += 1;
-                homeTeamStats[3] += 1;
+                away.Points += 1;
+                away.Ties += 1;
+                home.Points += 1;
+                home.Ties += 1;
             }
             // AWAY TEAM WINS: +3 pts, +1 win for away team; +1 loss for home team
             else if (awayGoals > homeGoals)
             {
-                awayTeamStats[0] += 3;
-                awayTeamStats[2] += 1;
-                homeTeamStats[4] += 1;
+                away.Points += 3;
+                away.Wins += 1;
+                home.Losses += 1;
             }
             // HOME TEAM WINS: +3 pts, +1 win for home team; +1 loss for away team
             else
             {
-                homeTeamStats[0] += 3;
-                homeTeamStats[2] += 1;
-                awayTeamStats[4] += 1;
+                away.Losses += 1;
+                home.Points += 3;
+                home.Wins += 1;
             }
         }
 
         static void Main(string[] args)
         {
+        }
+    }
+
+
+    class Team: IComparable<Team>
+    {
+        string _name;
+        int _points;
+        int _gamesPlayed;
+        int _wins;
+        int _ties;
+        int _losses;
+        int _netGoals;
+        int _goalsScored;
+        int _goalsAgainst;
+
+        public string Name
+        {
+            get => _name; 
+            set => _name = value;
+        }
+        public int Points
+        {
+            get => _points; 
+            set => _points = value;
+        }
+        public int GamesPlayed
+        {
+            get => _gamesPlayed;
+            set => _gamesPlayed = value;
+        }
+        public int Wins
+        {
+            get => _wins;
+            set => _wins = value;
+        }
+        public int Ties
+        {
+            get => _ties;
+            set => _ties = value;
+        }
+        public int Losses
+        {
+            get => _losses;
+            set => _losses = value;
+        }
+        public int NetGoals
+        {
+            get => _netGoals;
+            set => _netGoals = value;
+        }
+        public int GoalsScored
+        {
+            get => _goalsScored;
+            set => _goalsScored = value;
+        }
+        public int GoalsAgainst
+        {
+            get => _goalsAgainst;
+            set => _goalsAgainst = value;
+        }
+
+        public Team(String name)
+        {
+            _name = name;
+            _points = 0;
+            _gamesPlayed = 0;
+            _wins = 0;
+            _ties = 0;
+            _losses = 0;
+            _netGoals = 0;
+            _goalsScored = 0;
+            _goalsAgainst = 0;
+        }
+
+        public override string ToString()
+        {
+            // e.g., Spain 6p, 3g (2-0-1), 2gd (4-2)"
+            return $"{_name} {_points}p, {_gamesPlayed}g ({_wins}-{_ties}-{_losses}), {_netGoals}gd ({_goalsScored}-{_goalsAgainst})";
+        }
+        public int CompareTo(Team? other)
+        {
+            return 0;
         }
     }
 }
