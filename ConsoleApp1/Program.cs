@@ -224,7 +224,7 @@ namespace Program360
          * return -1 if this team ranks before the other team
          *         1 if this team ranks after the other team
          */
-        public int CompareTo(Team other)
+        public int CompareTo(Team? other)
         {
             if (other == null)
             {
@@ -265,11 +265,11 @@ namespace Program360
                 return 1;
             }
             // 4. Which team has scored more goals?
-            if (this._goalsScored > other._goalsAgainst)
+            if (this._goalsScored > other._goalsScored)
             {
                 return -1;
             }
-            else if (this._goalsScored < other._goalsAgainst)
+            else if (this._goalsScored < other._goalsScored)
             {
                 return 1;
             }
