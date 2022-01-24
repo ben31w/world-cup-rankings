@@ -13,70 +13,62 @@ namespace Program360
          */
         public static string[] getRankings(string[] matches)
         {
-            // The rankings array stores the group name first, then the teams ranked 1-4.
-            string[] rankings = new string[5];
-            rankings[0] = matches[0];
-
-            // Create the teams from the first two matches.
+            // Loop through the matches and create a list of teams names.
             // Match arrays have the form: {"awayTeam", "awayTeamGoals", "homeTeamGoals", "homeTeam"}
             //                              0           1                2                3
+            List<String> teamNames = new();
             char[] delimiters = { '#', '@' };
-            string[] match1 = matches[1].Split(delimiters);
-            string[] match2 = matches[2].Split(delimiters);
-            Team a = new Team(match1[0]);
-            Team b = new Team(match1[3]);
-            Team c = new Team(match2[0]);
-            Team d = new Team(match2[3]);
+            for (int i=1; i < matches.Length; i++)
+            {
+                string[] matchArray = matches[i].Split(delimiters);
+                string one = matchArray[0];
+                string two = matchArray[3];
+                if ( !teamNames.Contains(one) )
+                {
+                    teamNames.Add(one);
+                }
+                if ( !teamNames.Contains(two) )
+                {
+                    teamNames.Add(two);
+                }
+            }
+
+            // Loop through the team names and create a list of Teams.
+            List<Team> teams = new();
+            foreach (string teamName in teamNames)
+            {
+                teams.Add( new Team(teamName) );
+            }
 
             // Loop through the matches and add to each team's stats.
             for (int i = 1; i < matches.Length; i++)
             {
                 string[] matchArray = matches[i].Split(delimiters);
-                Team home;
-                Team away;
-                if ( matchArray[0].Equals(a.Name) )
+                Team home = new Team("home"); // these values will be overriden 
+                Team away = new Team("away"); // in the foreach loop
+                foreach (Team team in teams)
                 {
-                    away = a;
-                }
-                else if ( matchArray[0].Equals(b.Name) )
-                {
-                    away = b;
-                }
-                else if ( matchArray[0].Equals(c.Name) )
-                {
-                    away = c;
-                }
-                else
-                {
-                    away = d;
-                }
-                if ( matchArray[3].Equals(a.Name) )
-                {
-                    home = a;
-                }
-                else if ( matchArray[3].Equals(b.Name) )
-                {
-                    home = b;
-                }
-                else if ( matchArray[3].Equals(c.Name) )
-                {
-                    home = c;
-                }
-                else
-                {
-                    home = d;
+                    if ( team.Name.Equals(matchArray[0]) )
+                    {
+                        away = team;
+                    }
+                    else if ( team.Name.Equals(matchArray[3]) )
+                    {
+                        home = team;
+                    }
                 }
 
                 UpdateStats(matchArray, away, home);
             }
 
-            // Sort the teams.
-            Team[] teams = { a, b, c, d };
-            Array.Sort(teams);
+            // The rankings array stores the group name first, then the teams ranked 1-4.
+            string[] rankings = new string[teams.Count + 1];
+            rankings[0] = matches[0];
 
             // Place the teams into the rankings.
             // "<final-rank>) <Team-name> <points>p, <games-played>g (<W>-<T>-<L>), <goal-differential>gd (<goals-scored>-<goals-against>)"
-            for (int i=0; i<teams.Length; i++)
+            teams.Sort();
+            for (int i = 0; i < teams.Count; i++) 
             {
                 Team team = teams[i];
                 rankings[i + 1] = $"{i + 1}) {team.Name} {team.Points}p, {team.GamesPlayed}g ({team.Wins}-{team.Ties}-{team.Losses}), " +
