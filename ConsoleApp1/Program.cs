@@ -13,10 +13,14 @@ namespace Program360
          */
         public static string[] getRankings(string[] matches)
         {
-            // Loop through the matches and create a list of teams names.
-            // Match arrays have the form: {"awayTeam", "awayTeamGoals", "homeTeamGoals", "homeTeam"}
-            //                              0           1                2                3
+            // Loop through the matches and create a list of teams.
+            // The strings in 'matches' have the form: 
+            //          "<TeamA-name>#<TeamA-goals>@<TeamB-goals>#<TeamB-name>"
+            // Splitting this string yields this array:
+            //          {"awayTeam", "awayTeamGoals", "homeTeamGoals", "homeTeam"}
+            //            0           1                2                3
             List<String> teamNames = new();
+            List<Team> teams = new();
             char[] delimiters = { '#', '@' };
             for (int i=1; i < matches.Length; i++)
             {
@@ -26,18 +30,13 @@ namespace Program360
                 if ( !teamNames.Contains(one) )
                 {
                     teamNames.Add(one);
+                    teams.Add( new Team(one) );
                 }
                 if ( !teamNames.Contains(two) )
                 {
                     teamNames.Add(two);
+                    teams.Add( new Team(two) );
                 }
-            }
-
-            // Loop through the team names and create a list of Teams.
-            List<Team> teams = new();
-            foreach (string teamName in teamNames)
-            {
-                teams.Add( new Team(teamName) );
             }
 
             // Loop through the matches and add to each team's stats.
